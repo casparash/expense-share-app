@@ -1,18 +1,23 @@
 import { Router } from "express";
-import { users } from "../data/users";
+import {
+  getAllUsers,
+  getUser,
+  addUser,
+  deleteUser,
+} from "../services/users.service";
 
 const router = Router();
 
-console.log("Users routes loaded");
-
 router.get("/", (_req, res) => {
+  const users = getAllUsers();
+
   res.status(200).json(users);
 });
 
 router.get("/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const user = users.find((user) => user.id === id);
+  const user = getUser(id);
 
   if (!user) {
     return res.status(404).json({
@@ -26,15 +31,29 @@ router.get("/:id", (req, res) => {
 router.post("/", (req, res) => {
   const { name, email } = req.body;
 
-  const newUser = {
-    id: users.length + 1,
-    name,
-    email,
-  };
+  if (!name || !email) {
+    return res.status(400).json({
+      message: "Name and email are required",
+    });
+  }
 
-  users.push(newUser);
+  const newUser = addUser(name, email);
 
   res.status(201).json(newUser);
+});
+
+router.delete("/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const user = deleteUser(id);
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  res.status(204).send();
 });
 
 export default router;
