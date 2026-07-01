@@ -37,16 +37,15 @@ router.post("/", (req, res) => {
     });
   }
 
-  let success,
-    newGroup = addGroup(name, memberIds);
+  let result = addGroup(name, memberIds);
 
-  if (success === false) {
+  if (result.success === false) {
     return res.status(404).json({
-      message: "Id " + newGroup + " not found",
+      message: "Id " + result.invalidUserId + " not found",
     });
   }
 
-  res.status(201).json(newGroup);
+  res.status(201).json(result.group);
 });
 
 router.delete("/:id", (req, res) => {
